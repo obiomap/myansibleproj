@@ -1,4 +1,15 @@
 # myansibleproj
+Step1:
+Make sure Ansible is running on your ubuntu server: Follow the following steps
+Install Ansible in Linux.
+Verify System Details.
+Add Ansible PPA.
+Install Ansible in Ubuntu.
+Verify Ansible Version.
+Create SSH Key.
+Copy SSH Key Remote Server.
+Copy SSH Key Second Remote Host.
+
 This playbook creates and configures apache2 on ubuntu server.
 The following files are needed:
 hosts: This contains ip addresses of the servers to be configured.
