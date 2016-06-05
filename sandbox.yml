@@ -1,0 +1,45 @@
+- name: Create a sandbox instance
+  hosts: localhost 
+  become_user: root
+  remote_user: ubuntu
+  gather_facts: True 
+  vars_files:
+    - tasks/apache2.yml
+  
+  vars:
+    key_name: devops_key
+    keypair: devops_key
+    instance_type: t2.micro
+    security_group: devops_sg 
+    image: ami-2606f94b 
+    region: us-east-1
+  tasks:
+    - name: Launch instance
+      ec2:
+         key_name: "{{ keypair }}"
+         group: "{{ security_group }}"
+         instance_type: "{{ instance_type }}"
+         image: "{{ image }}"
+         wait: true
+         region: "{{ region }}"
+         vpc_subnet_id: subnet-986feac0 
+         assign_public_ip: yes
+         private_ip: 10.0.0.236
+      register: ec2
+    - name: Add new instance to host group
+      add_host: hostname={{ item.public_ip }} groupname=launched
+      with_items: ec2.instances
+    - name: Wait for SSH to come up
+      wait_for: host={{ item.public_dns_name }} port=22 delay=60 timeout=300 state=started
+      with_items: ec2.instances
+ #   - name: wait for the instance to start
+ #     local_action: wait_for state=started host={{ item.public_ip }} port=22
+ #     with_items: eip.results
+ #     ignore_errors: yes
+
+- name: Configure instance(s)
+  hosts: launched
+  become: True
+  gather_facts: false 
+  roles:
+#     -include: apache2.yml
